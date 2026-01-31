@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MRAID 3.0 Test</title>
+    <script src="mraid.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+        h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        h2 {
+            font-size: 14px;
+            margin: 15px 0 8px 0;
+            color: #666;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        h3 {
+            font-size: 12px;
+            margin: 10px 0 5px 0;
+            color: #888;
+        }
+        .section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .row:last-child {
+            border-bottom: none;
+        }
+        .label {
+            color: #666;
+        }
+        .value {
+            font-weight: 500;
+            color: #333;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-all;
+        }
+        .value.success { color: #4caf50; }
+        .value.error { color: #f44336; }
+        .value.warning { color: #ff9800; }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #2196f3;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            flex: 1;
+            min-width: 70px;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+        button.secondary {
+            background: #607d8b;
+        }
+        button.danger {
+            background: #f44336;
+        }
+        button.success {
+            background: #4caf50;
+        }
+        #eventLog {
+            background: #263238;
+            color: #aed581;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 10px;
+            border-radius: 6px;
+            height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .log-time {
+            color: #78909c;
+        }
+        .log-event {
+            color: #4fc3f7;
+        }
+        .log-error {
+            color: #ef5350;
+        }
+        .supports-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+        }
+        .supports-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .badge.yes { background: #c8e6c9; color: #2e7d32; }
+        .badge.no { background: #ffcdd2; color: #c62828; }
+        .props-display {
+            background: #f5f5f5;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            margin-top: 8px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>MRAID 3.0 Test Suite</h1>
+
+    <!-- Status Section -->
+    <div class="section">
+        <h2>Status</h2>
+        <div class="row">
+            <span class="label">MRAID Available</span>
+            <span class="value" id="mraidAvailable">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Version</span>
+            <span class="value" id="version">-</span>
+        </div>
+        <div class="row">
+            <span class="label">State</span>
+            <span class="value" id="state">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Placement Type</span>
+            <span class="value" id="placementType">-</span>
+        </div>
+        <div class="row">
+            <span class="label">isViewable</span>
+            <span class="value" id="isViewable">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Exposure %</span>
+            <span class="value" id="exposure">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Audio Volume %</span>
+            <span class="value" id="audioVolume">-</span>
+        </div>
+    </div>
+
+    <!-- MRAID_ENV Section -->
+    <div class="section">
+        <h2>MRAID_ENV</h2>
+        <div class="row">
+            <span class="label">SDK</span>
+            <span class="value" id="envSdk">-</span>
+        </div>
+        <div class="row">
+            <span class="label">SDK Version</span>
+            <span class="value" id="envSdkVersion">-</span>
+        </div>
+        <div class="row">
+            <span class="label">App ID</span>
+            <span class="value" id="envAppId">-</span>
+        </div>
+        <div class="row">
+            <span class="label">IFA</span>
+            <span class="value" id="envIfa">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Limit Ad Tracking</span>
+            <span class="value" id="envLat">-</span>
+        </div>
+        <div class="row">
+            <span class="label">COPPA</span>
+            <span class="value" id="envCoppa">-</span>
+        </div>
+    </div>
+
+    <!-- Supports Section -->
+    <div class="section">
+        <h2>Supports</h2>
+        <div class="supports-grid" id="supportsGrid"></div>
+    </div>
+
+    <!-- Position & Size Section -->
+    <div class="section">
+        <h2>Position & Size</h2>
+        <div class="row">
+            <span class="label">Current Position</span>
+            <span class="value" id="currentPosition">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Default Position</span>
+            <span class="value" id="defaultPosition">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Max Size</span>
+            <span class="value" id="maxSize">-</span>
+        </div>
+        <div class="row">
+            <span class="label">Screen Size</span>
+            <span class="value" id="screenSize">-</span>
+        </div>
+        <div class="row">
+            <span class="label">App Orientation</span>
+            <span class="value" id="appOrientation">-</span>
+        </div>
+    </div>
+
+    <!-- Properties Section -->
+    <div class="section">
+        <h2>Properties</h2>
+
+        <h3>Orientation Properties</h3>
+        <div class="btn-group">
+            <button onclick="getOrientationProps()">Get</button>
+            <button onclick="setOrientationPortrait()" class="secondary">Force Portrait</button>
+            <button onclick="setOrientationLandscape()" class="secondary">Force Landscape</button>
+            <button onclick="setOrientationNone()" class="secondary">None</button>
+        </div>
+        <div class="props-display" id="orientationProps">-</div>
+
+        <h3>Expand Properties</h3>
+        <div class="btn-group">
+            <button onclick="getExpandProps()">Get</button>
+            <button onclick="setExpandProps300x250()" class="secondary">300x250</button>
+            <button onclick="setExpandPropsFullscreen()" class="secondary">Fullscreen</button>
+        </div>
+        <div class="props-display" id="expandProps">-</div>
+
+        <h3>Resize Properties</h3>
+        <div class="btn-group">
+            <button onclick="getResizeProps()">Get</button>
+            <button onclick="setResizeProps300x250()" class="secondary">300x250</button>
+            <button onclick="setResizeProps320x50()" class="secondary">320x50</button>
+            <button onclick="setResizePropsInvalid()" class="danger">Invalid</button>
+        </div>
+        <div class="props-display" id="resizeProps">-</div>
+    </div>
+
+    <!-- Basic Actions Section -->
+    <div class="section">
+        <h2>Basic Actions</h2>
+        <div class="btn-group">
+            <button onclick="testOpen()">open()</button>
+            <button onclick="testClose()" class="danger">close()</button>
+            <button onclick="testUnload()" class="danger">unload()</button>
+        </div>
+        <div class="btn-group">
+            <button onclick="testExpand()" class="secondary">expand()</button>
+            <button onclick="testExpandWithUrl()" class="secondary">expand(url)</button>
+            <button onclick="testResize()" class="secondary">resize()</button>
+        </div>
+    </div>
+
+    <!-- Device Features Section -->
+    <div class="section">
+        <h2>Device Features</h2>
+        <div class="btn-group">
+            <button onclick="testPlayVideo()" class="secondary">playVideo()</button>
+            <button onclick="testStorePicture()" class="secondary">storePicture()</button>
+            <button onclick="testCreateCalendar()" class="secondary">createCalendarEvent()</button>
+        </div>
+        <div class="btn-group">
+            <button onclick="testSms()" class="secondary">SMS Link</button>
+            <button onclick="testTel()" class="secondary">Tel Link</button>
+        </div>
+    </div>
+
+    <!-- Utility Section -->
+    <div class="section">
+        <h2>Utility</h2>
+        <div class="btn-group">
+            <button onclick="refreshStatus()" class="success">Refresh Status</button>
+            <button onclick="refreshAllProps()" class="success">Refresh Props</button>
+            <button onclick="clearLog()" class="secondary">Clear Log</button>
+        </div>
+    </div>
+
+    <!-- Event Log Section -->
+    <div class="section">
+        <h2>Event Log</h2>
+        <div id="eventLog"></div>
+    </div>
+
+    <script>
+        var logEl = document.getElementById('eventLog');
+        var eventCount = 0;
+
+        function log(message, type) {
+            eventCount++;
+            var time = new Date().toLocaleTimeString();
+            var typeClass = type === 'error' ? 'log-error' : 'log-event';
+            var line = '<span class="log-time">[' + time + ']</span> <span class="' + typeClass + '">' + message + '</span>\n';
+            logEl.innerHTML = line + logEl.innerHTML;
+            var lines = logEl.innerHTML.split('\n');
+            if (lines.length > 100) {
+                logEl.innerHTML = lines.slice(0, 100).join('\n');
+            }
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '';
+            eventCount = 0;
+            log('Log cleared');
+        }
+
+        function setText(id, value, className) {
+            var el = document.getElementById(id);
+            el.textContent = value;
+            el.className = 'value' + (className ? ' ' + className : '');
+        }
+
+        function formatRect(rect) {
+            if (!rect) return 'null';
+            return 'x:' + rect.x + ' y:' + rect.y + ' w:' + rect.width + ' h:' + rect.height;
+        }
+
+        function formatJson(obj) {
+            return JSON.stringify(obj, null, 2);
+        }
+
+        function updateMraidEnv() {
+            if (window.MRAID_ENV) {
+                setText('envSdk', MRAID_ENV.sdk || '-');
+                setText('envSdkVersion', MRAID_ENV.sdkVersion || '-');
+                setText('envAppId', MRAID_ENV.appId || '-');
+                setText('envIfa', MRAID_ENV.ifa || '-');
+                setText('envLat', String(MRAID_ENV.limitAdTracking));
+                setText('envCoppa', String(MRAID_ENV.coppa));
+            }
+        }
+
+        function updateSupports() {
+            var features = ['sms', 'tel', 'calendar', 'storePicture', 'inlineVideo', 'vpaid', 'location'];
+            var grid = document.getElementById('supportsGrid');
+            grid.innerHTML = '';
+            features.forEach(function(feature) {
+                var supported = mraid.supports(feature);
+                var div = document.createElement('div');
+                div.className = 'supports-item';
+                div.innerHTML = '<span>' + feature + '</span><span class="badge ' + (supported ? 'yes' : 'no') + '">' + (supported ? 'Yes' : 'No') + '</span>';
+                grid.appendChild(div);
+            });
+        }
+
+        function refreshStatus() {
+            if (!window.mraid) {
+                setText('mraidAvailable', 'No', 'error');
+                return;
+            }
+
+            setText('mraidAvailable', 'Yes', 'success');
+            setText('version', mraid.getVersion());
+            setText('state', mraid.getState());
+            setText('placementType', mraid.getPlacementType());
+            setText('isViewable', String(mraid.isViewable()));
+
+            var currentPos = mraid.getCurrentPosition();
+            setText('currentPosition', formatRect(currentPos));
+
+            var defaultPos = mraid.getDefaultPosition();
+            setText('defaultPosition', formatRect(defaultPos));
+
+            var maxSize = mraid.getMaxSize();
+            setText('maxSize', maxSize.width + ' x ' + maxSize.height);
+
+            var screenSize = mraid.getScreenSize();
+            setText('screenSize', screenSize.width + ' x ' + screenSize.height);
+
+            setText('appOrientation', JSON.stringify(mraid.getCurrentAppOrientation()));
+
+            updateSupports();
+            updateMraidEnv();
+
+            log('Status refreshed');
+        }
+
+        function refreshAllProps() {
+            getOrientationProps();
+            getExpandProps();
+            getResizeProps();
+            log('All properties refreshed');
+        }
+
+        function setupEventListeners() {
+            if (!window.mraid) return;
+
+            mraid.addEventListener('ready', function() {
+                log('EVENT: ready');
+                refreshStatus();
+            });
+
+            mraid.addEventListener('error', function(message, action) {
+                log('EVENT: error - ' + action + ': ' + message, 'error');
+            });
+
+            mraid.addEventListener('stateChange', function(state) {
+                log('EVENT: stateChange -> ' + state);
+                setText('state', state);
+            });
+
+            mraid.addEventListener('viewableChange', function(isViewable) {
+                log('EVENT: viewableChange -> ' + isViewable);
+                setText('isViewable', String(isViewable));
+            });
+
+            mraid.addEventListener('exposureChange', function(exposedPercentage, visibleRect, occlusionRects) {
+                log('EVENT: exposureChange -> ' + exposedPercentage.toFixed(1) + '% rect:' + formatRect(visibleRect));
+                setText('exposure', exposedPercentage.toFixed(1) + '%');
+            });
+
+            mraid.addEventListener('audioVolumeChange', function(volumePercentage) {
+                var vol = volumePercentage !== null ? volumePercentage.toFixed(1) + '%' : 'null';
+                log('EVENT: audioVolumeChange -> ' + vol);
+                setText('audioVolume', vol);
+            });
+
+            mraid.addEventListener('sizeChange', function(width, height) {
+                log('EVENT: sizeChange -> ' + width + ' x ' + height);
+            });
+        }
+
+        // ==================== Orientation Properties ====================
+        function getOrientationProps() {
+            var props = mraid.getOrientationProperties();
+            document.getElementById('orientationProps').textContent = formatJson(props);
+            log('getOrientationProperties: ' + JSON.stringify(props));
+        }
+
+        function setOrientationPortrait() {
+            log('setOrientationProperties: forceOrientation=portrait');
+            mraid.setOrientationProperties({ allowOrientationChange: false, forceOrientation: 'portrait' });
+            getOrientationProps();
+        }
+
+        function setOrientationLandscape() {
+            log('setOrientationProperties: forceOrientation=landscape');
+            mraid.setOrientationProperties({ allowOrientationChange: false, forceOrientation: 'landscape' });
+            getOrientationProps();
+        }
+
+        function setOrientationNone() {
+            log('setOrientationProperties: forceOrientation=none');
+            mraid.setOrientationProperties({ allowOrientationChange: true, forceOrientation: 'none' });
+            getOrientationProps();
+        }
+
+        // ==================== Expand Properties ====================
+        function getExpandProps() {
+            var props = mraid.getExpandProperties();
+            document.getElementById('expandProps').textContent = formatJson(props);
+            log('getExpandProperties: ' + JSON.stringify(props));
+        }
+
+        function setExpandProps300x250() {
+            log('setExpandProperties: 300x250');
+            mraid.setExpandProperties({ width: 300, height: 250 });
+            getExpandProps();
+        }
+
+        function setExpandPropsFullscreen() {
+            var screenSize = mraid.getScreenSize();
+            log('setExpandProperties: fullscreen ' + screenSize.width + 'x' + screenSize.height);
+            mraid.setExpandProperties({ width: screenSize.width, height: screenSize.height });
+            getExpandProps();
+        }
+
+        // ==================== Resize Properties ====================
+        function getResizeProps() {
+            var props = mraid.getResizeProperties();
+            document.getElementById('resizeProps').textContent = formatJson(props);
+            log('getResizeProperties: ' + JSON.stringify(props));
+        }
+
+        function setResizeProps300x250() {
+            log('setResizeProperties: 300x250');
+            mraid.setResizeProperties({
+                width: 300,
+                height: 250,
+                offsetX: 0,
+                offsetY: 0,
+                allowOffscreen: false
+            });
+            getResizeProps();
+        }
+
+        function setResizeProps320x50() {
+            log('setResizeProperties: 320x50');
+            mraid.setResizeProperties({
+                width: 320,
+                height: 50,
+                offsetX: 0,
+                offsetY: 0,
+                allowOffscreen: false
+            });
+            getResizeProps();
+        }
+
+        function setResizePropsInvalid() {
+            log('setResizeProperties: invalid (width=30, height="abc")');
+            mraid.setResizeProperties({
+                width: 30,        // Invalid: < 50
+                height: 'abc',    // Invalid: not a number
+                offsetX: 0,
+                offsetY: 0,
+                allowOffscreen: 'yes'  // Invalid: not boolean
+            });
+            getResizeProps();
+        }
+
+        // ==================== Basic Actions ====================
+        function testOpen() {
+            log('Calling mraid.open("https://www.example.com")');
+            mraid.open('https://www.example.com');
+        }
+
+        function testClose() {
+            log('Calling mraid.close()');
+            mraid.close();
+        }
+
+        function testUnload() {
+            log('Calling mraid.unload()');
+            mraid.unload();
+        }
+
+        function testExpand() {
+            log('Calling mraid.expand()');
+            mraid.expand();
+        }
+
+        function testExpandWithUrl() {
+            log('Calling mraid.expand("https://www.example.com/expandable.html")');
+            mraid.expand('https://www.example.com/expandable.html');
+        }
+
+        function testResize() {
+            log('Calling mraid.resize() with current resizeProperties');
+            mraid.resize();
+        }
+
+        // ==================== Device Features ====================
+        function testPlayVideo() {
+            log('Calling mraid.playVideo()');
+            mraid.playVideo('https://www.example.com/video.mp4');
+        }
+
+        function testStorePicture() {
+            log('Calling mraid.storePicture()');
+            mraid.storePicture('https://www.example.com/image.jpg');
+        }
+
+        function testCreateCalendar() {
+            log('Calling mraid.createCalendarEvent()');
+            mraid.createCalendarEvent({
+                description: 'MRAID Test Event',
+                location: 'Test Location',
+                summary: 'Test Summary',
+                start: '2025-12-25T10:00:00-05:00',
+                end: '2025-12-25T11:00:00-05:00'
+            });
+        }
+
+        function testSms() {
+            log('Opening SMS link via mraid.open()');
+            mraid.open('sms:+1234567890?body=Hello%20from%20MRAID');
+        }
+
+        function testTel() {
+            log('Opening Tel link via mraid.open()');
+            mraid.open('tel:+1234567890');
+        }
+
+        // ==================== Initialize ====================
+        function init() {
+            log('Test page loaded');
+
+            if (window.mraid) {
+                setupEventListeners();
+
+                if (mraid.getState() === 'loading') {
+                    log('MRAID state is loading, waiting for ready...');
+                } else {
+                    log('MRAID already ready');
+                    refreshStatus();
+                    refreshAllProps();
+                }
+            } else {
+                log('MRAID not available!', 'error');
+                setText('mraidAvailable', 'No', 'error');
+            }
+
+            updateMraidEnv();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
